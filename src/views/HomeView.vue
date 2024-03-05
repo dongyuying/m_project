@@ -36,19 +36,51 @@ const config = reactive({
   title: '城市人员统计'
 })
 
+
+
+const timeObj = reactive({
+  year: 0,
+  month: <string | number>'',
+  day: <string | number>'',
+  h: <string | number>'',
+  m: <string | number>'',
+  s: <string | number>''
+})
+
+const timer = ref()
+
 const appRef = ref()
+
+const setIntervalTime = () => {
+  const date = new Date()
+  let month = date.getMonth() + 1
+  let day = date.getDate()
+  let h = date.getHours()
+  let m = date.getMinutes()
+  let s = date.getSeconds()
+  timeObj.year = date.getFullYear()
+  timeObj.month = month > 10 ? month : '0' + month
+  timeObj.day = day > 10 ? day : '0' + day
+  timeObj.h = h > 10 ? h : '0' + h
+  timeObj.m = m > 10 ? m : '0' + m
+  timeObj.s = s > 10 ? s : '0' + s
+}
 
 onMounted(() => {
   useDrawRiseze(appRef)
   window.addEventListener('resize', () => {
     useDrawRiseze(appRef)
   })
+  timer.value = setInterval(() => {
+    setIntervalTime()
+  }, 1000)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', () => {
     // useDrawRiseze(appRef)
   })
+  clearInterval(timer.value)
 })
 </script>
 
@@ -56,7 +88,9 @@ onBeforeUnmount(() => {
   <div class="data-info">
     <div class="box" ref="appRef">
       <dv-border-box11 title="可视化数据大屏">
-        <div class="time-info">2024年02月19号 15:05:30</div>
+        <div class="time-info" v-if="timeObj.year">{{ timeObj.year }}年{{ timeObj.month }}月{{ timeObj.day }}号
+          {{ timeObj.h }}:{{ timeObj.m }}:{{ timeObj.s }}</div>
+        <div class="time-info" v-else></div>
         <div class="data-content">
           <div class="top-info">
             <div class="left">
@@ -139,13 +173,14 @@ $h30: 30px;
 
   .box {
 
-position: absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-transform-origin: left top;
-width: 1920px;
-height: 1080px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: left top;
+    width: 1920px;
+    height: 1080px;
+
     :deep(>.dv-border-box-11 >.border-box-content) {
       padding: 40px 20px 20px;
     }
@@ -210,9 +245,11 @@ height: 1080px;
   }
 
   .time-info {
+    padding-left: 20px;
     height: 20px;
     line-height: 20px;
     font-size: 16px;
+    color: #cbbfbf;
   }
 }
 </style>
